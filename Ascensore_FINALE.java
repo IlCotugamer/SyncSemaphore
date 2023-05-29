@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-public class test2 {
+public class Ascensore_FINALE {
     private static final int N = 1; // Numero di piani
     private static Semaphore entrataPasseggeri = new Semaphore(1);
     private static Semaphore discesaPasseggeri = new Semaphore(1);
