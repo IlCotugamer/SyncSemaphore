@@ -1,0 +1,58 @@
+ACCESSO_ASCENSORE <-- Semaforo(0)
+ENTRATA_PASSEGGERI <-- Semaforo(1)
+DISCESA_PASSEGGERI <-- Semaforo(1)
+MUTEX <-- Semaforo(1)
+N <-- 6 //ULTIMO PIANO PALAZZO
+prenotazioni <-- lista vuota intera
+pianoCorrente <-- 0
+
+Processo ascensoreThread():
+    direzione <-- vero
+    while vero:
+        ACCESSO_ASCENSORE.P()
+        ACCESSO_ASCENSORE.P()
+
+        stampa "CHIUDI LE PORTE --- " + ("sale" se direzione altrimenti "scende") + "\n"
+        stampa "\tPiano: " + pianoCorrente + "; Passeggeri: " + lunghezza(prenotazioni) + "\n"
+
+        for i <-- 0 to lunghezza(prenotazioni) - 1:
+            stampa "Passeggero: " + (i + 1) + ", scende al piano: " + prenotazioni[i]
+
+        se pianoCorrente == N:
+            direzione <-- falso
+        altrimenti pianoCorrente == 0:
+            direzione <-- vero
+
+        pianoCorrente <-- pianoCorrente + 1 se direzione altrimenti pianoCorrente - 1
+
+        sleep(3.5)
+        stampa "APRI LE PORTE\n"
+
+        ENTRATA_PASSEGGERI.V()
+        DISCESA_PASSEGGERI.V()
+
+Processo entrataPasseggeriThread():
+    while vero:
+        ENTRATA_PASSEGGERI.P()
+
+        num_passeggeri <-- random tra 0 e 15
+
+        for i <-- 0 to num_passeggeri - 1:
+            MUTEX.P()
+            prenotazioni.aggiungi(random tra 0 e N)
+            MUTEX.V()
+
+        ACCESSO_ASCENSORE.V()
+
+Processo discesaPasseggeriThread():
+    while vero:
+        DISCESA_PASSEGGERI.P()
+
+        for i <-- 0 to lunghezza(prenotazioni) - 1:
+            prenotazione <-- prenotazioni
+            se prenotazione == pianoCorrente:
+                MUTEX.P()
+                prenotazioni.pop(i)
+                MUTEX.V()
+
+        ACCESSO_ASCENSORE.V()
